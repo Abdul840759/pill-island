@@ -127,9 +127,37 @@ class PillOverlayService : Service() {
         pillView.post {
             val title = pillView.findViewById<TextView>(R.id.notif_title)
             val text = pillView.findViewById<TextView>(R.id.notif_text)
+            val buttons = pillView.findViewById<LinearLayout>(R.id.call_buttons)
+            val acceptBtn = pillView.findViewById<Button>(R.id.btn_accept)
+            val rejectBtn = pillView.findViewById<Button>(R.id.btn_reject)
+
             title.text = "Incoming Call"
             text.text = number
+            buttons.visibility = View.VISIBLE
             expandPillForCall()
+
+            acceptBtn.setOnClickListener {
+                answerCall()
+            }
+            rejectBtn.setOnClickListener {
+                silenceRinger()
+            }
+        }
+    }
+
+    private fun answerCall() {
+        try {
+            val telecomManager = getSystemService(Context.TELECOM_SERVICE) as android.telecom.TelecomManager
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(
+                        this, android.Manifest.permission.ANSWER_PHONE_CALLS
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                ) {
+                    telecomManager.acceptRingingCall()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -143,7 +171,9 @@ class PillOverlayService : Service() {
     fun hideCallUI() {
         pillView.post {
             val panel = pillView.findViewById<LinearLayout>(R.id.expanded_panel)
+            val buttons = pillView.findViewById<LinearLayout>(R.id.call_buttons)
             panel.visibility = View.GONE
+            buttons.visibility = View.GONE
             isExpanded = false
         }
     }
