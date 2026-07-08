@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     private fun checkAndRequestPermissions() {
         when {
             !hasOverlayPermission() -> requestOverlayPermission()
-            !hasNotificationListenerPermission() -> requestNotificationListenerPermission()
             !isBatteryOptimizationIgnored() -> requestBatteryOptimizationExemption()
             else -> startPillService()
         }
