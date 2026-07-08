@@ -30,6 +30,9 @@ class PillOverlayService : Service() {
         startForeground(1, buildForegroundNotification())
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         createPill()
+
+        callListener = PhoneCallListener(this)
+        callListener?.start()
     }
 
     private fun createPill() {
@@ -112,6 +115,50 @@ class PillOverlayService : Service() {
         pillView.post {
             val dot = pillView.findViewById<View>(R.id.notif_dot)
             dot?.visibility = View.VISIBLE
+        }
+    }
+
+
+    private var callListener: PhoneCallListener? = null
+    private var isRingerSilenced = false
+
+    fun showIncomingCall(number: String) {
+        isRingerSilenced = false
+        pillView.post {
+            val title = pillView.findViewById<TextView>(R.id.notif_title)
+            val text = pillView.findViewById<TextView>(R.id.notif_text)
+            title.text = "Incoming Call"
+            text.text = number
+            expandPillForCall()
+        }
+    }
+
+    fun showOngoingCall() {
+        pillView.post {
+            val title = pillView.findViewById<TextView>(R.id.notif_title)
+            title.text = "Call in progress"
+        }
+    }
+
+    fun hideCallUI() {
+        pillView.post {
+            val panel = pillView.findViewById<LinearLayout>(R.id.expanded_panel)
+            panel.visibility = View.GONE
+            isExpanded = false
+        }
+    }
+
+    private fun expandPillForCall() {
+        val panel = pillView.findViewById<LinearLayout>(R.id.expanded_panel)
+        panel.visibility = View.VISIBLE
+        isExpanded = true
+    }
+
+    fun silenceRinger() {
+        if (!isRingerSilenced) {
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+            audioManager.ringerMode = android.media.AudioManager.RINGER_MODE_SILENT
+            isRingerSilenced = true
         }
     }
 
