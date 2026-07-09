@@ -39,6 +39,21 @@ class PillOverlayService : Service() {
         val inflater = LayoutInflater.from(this)
         pillView = inflater.inflate(R.layout.pill_layout, null)
 
+        val sizeMultiplier = PillPrefs.getSize(this)
+        val shape = PillPrefs.getShape(this)
+        val pillContainer = pillView.findViewById<LinearLayout>(R.id.pill_container)
+        val baseSizeDp = 40
+        val newHeightDp = (baseSizeDp * sizeMultiplier).toInt()
+        val density = resources.displayMetrics.density
+        pillContainer.layoutParams.height = (newHeightDp * density).toInt()
+
+        if (shape == "android") {
+            pillContainer.setBackgroundResource(R.drawable.circle_background)
+            pillContainer.layoutParams.width = (newHeightDp * density).toInt()
+        } else {
+            pillContainer.setBackgroundResource(R.drawable.pill_background)
+        }
+
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
