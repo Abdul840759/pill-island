@@ -22,14 +22,7 @@
             android:background="@drawable/dot_background"
             android:visibility="gone" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:text="Pill Island"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -60,7 +53,6 @@
             android:text=""
             android:textColor="#CCCCCC"
             android:textSize="12sp" />
-
         <LinearLayout
             android:id="@+id/call_buttons"
             android:layout_width="match_parent"
@@ -71,22 +63,11 @@
 
             <Button
                 android:id="@+id/btn_reject"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
                 android:text="Silence"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#FF3B30" />
-
-            <Button
-                android:id="@+id/btn_accept"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Accept"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#34C759" />
 
         </LinearLayout>
 
