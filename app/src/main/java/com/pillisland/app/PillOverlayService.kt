@@ -16,6 +16,7 @@ class PillOverlayService : Service() {
     private lateinit var pillView: View
     private var isExpanded = false
     private val CHANNEL_ID = "pill_island_channel"
+    private val chargingReceiver = ChargingReceiver()
     var latestNotifTitle = ""
     var latestNotifText = ""
 
@@ -33,6 +34,12 @@ class PillOverlayService : Service() {
 
         callListener = PhoneCallListener(this)
         callListener?.start()
+
+        val filter = android.content.IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        }
+        registerReceiver(chargingReceiver, filter)
     }
 
     private fun createPill() {
@@ -52,7 +59,10 @@ class PillOverlayService : Service() {
             pillContainer.layoutParams.width = (newHeightDp * density).toInt()
         } else {
             pillContainer.setBackgroundResource(R.drawable.pill_background)
+            val pillWidthDp = (baseSizeDp * 2.4f * sizeMultiplier).toInt()
+            pillContainer.layoutParams.width = (pillWidthDp * density).toInt()
         }
+        pillContainer.requestLayout()
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -203,6 +213,26 @@ class PillOverlayService : Service() {
         }
     }
 
+    fun showCharging(percent: Int) {
+        pillView.post {
+            val title = pillView.findViewById<TextView>(R.id.notif_title)
+            val text = pillView.findViewById<TextView>(R.id.notif_text)
+            title.text = "Charging"
+            text.text = "$percent%"
+            val panel = pillView.findViewById<LinearLayout>(R.id.expanded_panel)
+            panel.visibility = View.VISIBLE
+            isExpanded = true
+        }
+    }
+
+    fun hideCharging() {
+        pillView.post {
+            val panel = pillView.findViewById<LinearLayout>(R.id.expanded_panel)
+            panel.visibility = View.GONE
+            isExpanded = false
+        }
+    }
+
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -230,6 +260,7 @@ class PillOverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+        unregisterReceiver(chargingReceiver)
         if (::pillView.isInitialized) windowManager.removeView(pillView)
     }
 
